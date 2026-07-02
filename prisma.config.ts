@@ -9,6 +9,9 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    // Use the unpooled connection for migrations (pgbouncer's transaction
+    // pooling mode can be unreliable for DDL); the app itself connects with
+    // the pooled DATABASE_URL at runtime via src/lib/db.ts.
+    url: process.env["DATABASE_URL_UNPOOLED"] ?? process.env["DATABASE_URL"],
   },
 });
