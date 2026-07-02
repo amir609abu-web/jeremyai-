@@ -30,18 +30,18 @@ export default async function DashboardPage({
       <TickerStrip />
 
       <div className="mx-auto max-w-6xl px-6 py-12">
-        <div className="flex items-center justify-between">
-          <div>
+        <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
             <p className="text-sm text-muted">{t("signedInAs")}</p>
-            <p className="font-display text-xl font-semibold" dir="ltr">
+            <p className="truncate font-display text-xl font-semibold" dir="ltr">
               {user.email}
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-3">
             {user.isAdmin && (
               <Link
                 href="/admin"
-                className="rounded-full border border-border-glass px-4 py-2 text-sm text-foreground hover:bg-white/5"
+                className="whitespace-nowrap rounded-full border border-border-glass px-4 py-2 text-sm text-foreground hover:bg-white/5"
               >
                 {t("admin")}
               </Link>

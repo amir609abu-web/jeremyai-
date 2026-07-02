@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { MobileNavMenu } from "@/components/mobile-nav-menu";
 
 export async function Navbar() {
   const t = await getTranslations("Nav");
@@ -13,7 +14,7 @@ export async function Navbar() {
   ];
 
   return (
-    <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-6">
+    <header className="relative mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-6">
       <Link href="/" className="flex items-center gap-2">
         <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-sm font-bold text-[#04140a] font-display">
           J
@@ -39,10 +40,11 @@ export async function Navbar() {
         <LanguageSwitcher />
         <Link
           href="/signup"
-          className="rounded-full bg-white/10 px-5 py-2 text-sm font-medium text-foreground transition-colors hover:bg-white/15"
+          className="hidden rounded-full bg-white/10 px-5 py-2 text-sm font-medium text-foreground transition-colors hover:bg-white/15 md:block"
         >
           {t("getStarted")}
         </Link>
+        <MobileNavMenu links={links} ctaLabel={t("getStarted")} />
       </div>
     </header>
   );

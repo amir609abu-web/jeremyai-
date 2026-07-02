@@ -50,8 +50,8 @@ export default async function AdminPage({
       </div>
 
       <h2 className="mt-10 font-display text-lg font-semibold">{t("recentSignups")}</h2>
-      <div className="mt-4 overflow-hidden rounded-xl border border-border-glass">
-        <table className="w-full text-start text-sm">
+      <div className="mt-4 overflow-x-auto rounded-xl border border-border-glass">
+        <table className="w-full min-w-[560px] text-start text-sm">
           <thead className="bg-white/5 text-muted">
             <tr>
               <th className="px-4 py-3 font-medium">{t("colEmail")}</th>

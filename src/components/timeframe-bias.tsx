@@ -55,7 +55,7 @@ export function TimeframeBias({ symbol = "OANDA:EUR_USD" }: { symbol?: string })
   };
 
   return (
-    <div className="glass-card rounded-2xl p-6">
+    <div className="glass-card rounded-2xl p-4 sm:p-6">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm text-muted" dir="ltr">
@@ -76,7 +76,7 @@ export function TimeframeBias({ symbol = "OANDA:EUR_USD" }: { symbol?: string })
         )}
       </div>
 
-      <div className="mt-5 grid grid-cols-5 gap-2">
+      <div className="mt-5 grid grid-cols-3 gap-2 sm:grid-cols-5">
         {(loading
           ? (Array.from({ length: 5 }) as (BiasResult["timeframes"][number] | null)[])
           : data?.timeframes ?? []

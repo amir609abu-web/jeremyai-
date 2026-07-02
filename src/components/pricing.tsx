@@ -16,7 +16,7 @@ export async function Pricing() {
         <p className="mt-4 text-muted">{t("subtitle")}</p>
       </div>
 
-      <div className="glass-card mx-auto max-w-md rounded-3xl p-8 text-center">
+      <div className="glass-card mx-auto max-w-md rounded-3xl p-6 text-center sm:p-8">
         <p className="font-display text-sm font-medium uppercase tracking-widest text-primary">
           {t("plan")}
         </p>

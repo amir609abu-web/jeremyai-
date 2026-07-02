@@ -12,7 +12,7 @@ export function AIPreviewChat() {
   ];
 
   return (
-    <div className="glass-card flex h-full flex-col rounded-2xl p-6">
+    <div className="glass-card flex h-full flex-col rounded-2xl p-4 sm:p-6">
       <div className="flex items-center gap-3">
         <motion.div
           animate={{ boxShadow: [
@@ -50,9 +50,12 @@ export function AIPreviewChat() {
       </div>
 
       <div className="mt-5 flex items-center gap-2 rounded-full border border-border-glass bg-white/5 px-4 py-2.5 text-sm text-muted-2">
-        {t("aiInputPlaceholder")}
-        <span className="ms-auto text-xs text-muted-2">{t("aiInputNote")}</span>
+        <span className="truncate">{t("aiInputPlaceholder")}</span>
+        <span className="ms-auto hidden shrink-0 text-xs text-muted-2 sm:inline">
+          {t("aiInputNote")}
+        </span>
       </div>
+      <p className="mt-2 text-center text-xs text-muted-2 sm:hidden">{t("aiInputNote")}</p>
     </div>
   );
 }
