@@ -1,0 +1,149 @@
+@import "tailwindcss";
+
+:root {
+  --background: #050806;
+  --background-elevated: #0a0f0c;
+  --foreground: #f4f7f5;
+  --muted: #93a39a;
+  --muted-2: #5c6b62;
+  --primary: #34e17a;
+  --primary-dim: #1a9f52;
+  --primary-deep: #0a3d24;
+  --border-glass: rgba(255, 255, 255, 0.08);
+  --card-glass: rgba(16, 26, 20, 0.55);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-background-elevated: var(--background-elevated);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-2: var(--muted-2);
+  --color-primary: var(--primary);
+  --color-primary-dim: var(--primary-dim);
+  --color-primary-deep: var(--primary-deep);
+  --color-border-glass: var(--border-glass);
+  --color-card-glass: var(--card-glass);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-space-grotesk);
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-display), var(--font-sans), sans-serif;
+}
+
+.glass-card {
+  background: linear-gradient(180deg, rgba(30, 48, 38, 0.55) 0%, rgba(8, 14, 11, 0.75) 100%);
+  border: 1px solid var(--border-glass);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 20px 60px -20px rgba(0, 0, 0, 0.6);
+}
+
+.glass-card-solid {
+  background: linear-gradient(180deg, rgba(34, 54, 43, 0.92) 0%, rgba(7, 13, 10, 0.96) 100%);
+  border: 1px solid var(--border-glass);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 20px 60px -20px rgba(0, 0, 0, 0.6);
+}
+
+.glow-text {
+  text-shadow: 0 0 40px rgba(52, 225, 122, 0.25);
+}
+
+.bg-noise {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+::selection {
+  background: var(--primary);
+  color: #04140a;
+}
+
+.shimmer-text {
+  background: linear-gradient(
+    90deg,
+    rgba(147, 163, 154, 0.7) 0%,
+    #ffffff 50%,
+    rgba(147, 163, 154, 0.7) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 3.5s linear infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 28s linear infinite;
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 40s linear infinite;
+}
+
+.animate-spin-slow-reverse {
+  animation: spin-slow 60s linear infinite reverse;
+}
+
+@keyframes light-sweep {
+  0% {
+    transform: translateX(-60%) rotate(18deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(60%) rotate(18deg);
+    opacity: 0;
+  }
+}
+
+.animate-light-sweep {
+  animation: light-sweep 5s ease-in-out infinite;
+}
