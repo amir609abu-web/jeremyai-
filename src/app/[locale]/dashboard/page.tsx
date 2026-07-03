@@ -4,7 +4,7 @@ import { getCurrentUser } from "@/lib/session";
 import { LogoutButton } from "@/components/logout-button";
 import { TickerStrip } from "@/components/ticker-strip";
 import { TimeframeBias } from "@/components/timeframe-bias";
-import { AIPreviewChat } from "@/components/ai-preview-chat";
+import { AIChatPanel } from "@/components/ai-chat-panel";
 import { EconomicCalendarList } from "@/components/economic-calendar-list";
 
 export default async function DashboardPage({
@@ -54,13 +54,15 @@ export default async function DashboardPage({
           {t("trialBanner")}
         </div>
 
-        <div className="mt-8 grid gap-6 lg:grid-cols-2">
-          <TimeframeBias />
-          <AIPreviewChat />
-        </div>
+        <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
+          <div className="space-y-6">
+            <TimeframeBias />
+            <EconomicCalendarList />
+          </div>
 
-        <div className="mt-6">
-          <EconomicCalendarList />
+          <div className="lg:sticky lg:top-6 lg:h-[calc(100vh-96px)]">
+            <AIChatPanel />
+          </div>
         </div>
       </div>
     </div>

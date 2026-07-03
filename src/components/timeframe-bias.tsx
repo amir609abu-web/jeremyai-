@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import type { BiasResult } from "@/lib/market-data";
+import { INSTRUMENTS, type BiasResult } from "@/lib/market-data";
 
 const BIAS_STYLE_CLASSES = {
   bullish: {
@@ -26,8 +26,13 @@ const BIAS_STYLE_CLASSES = {
   },
 } as const;
 
-export function TimeframeBias({ symbol = "OANDA:EUR_USD" }: { symbol?: string }) {
+export function TimeframeBias({
+  symbol: defaultSymbol = INSTRUMENTS[0].symbol,
+}: {
+  symbol?: string;
+}) {
   const t = useTranslations("Dashboard");
+  const [symbol, setSymbol] = useState(defaultSymbol);
   const [data, setData] = useState<BiasResult | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -54,15 +59,12 @@ export function TimeframeBias({ symbol = "OANDA:EUR_USD" }: { symbol?: string })
     neutral: t("neutral"),
   };
 
+  const activeInstrument = INSTRUMENTS.find((i) => i.symbol === symbol) ?? INSTRUMENTS[0];
+
   return (
     <div className="glass-card rounded-2xl p-4 sm:p-6">
       <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-muted" dir="ltr">
-            {symbol.replace("OANDA:", "").replace("_", "/")}
-          </p>
-          <h3 className="font-display text-lg font-semibold">{t("biasCardTitle")}</h3>
-        </div>
+        <h3 className="font-display text-lg font-semibold">{t("biasCardTitle")}</h3>
         {data && (
           <span
             className={`rounded-full px-3 py-1 text-xs ${
@@ -76,7 +78,38 @@ export function TimeframeBias({ symbol = "OANDA:EUR_USD" }: { symbol?: string })
         )}
       </div>
 
-      <div className="mt-5 grid grid-cols-3 gap-2 sm:grid-cols-5">
+      <div
+        className="mt-4 -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1"
+        dir="ltr"
+        role="tablist"
+      >
+        {INSTRUMENTS.map((instrument) => (
+          <button
+            key={instrument.symbol}
+            type="button"
+            role="tab"
+            aria-selected={instrument.symbol === symbol}
+            onClick={() => {
+              if (instrument.symbol === symbol) return;
+              setLoading(true);
+              setSymbol(instrument.symbol);
+            }}
+            className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+              instrument.symbol === symbol
+                ? "border-primary/40 bg-primary/15 text-primary"
+                : "border-border-glass bg-white/5 text-muted hover:text-foreground"
+            }`}
+          >
+            {instrument.display}
+          </button>
+        ))}
+      </div>
+
+      <p className="mt-3 text-xs text-muted-2" dir="ltr">
+        {activeInstrument.display}
+      </p>
+
+      <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5">
         {(loading
           ? (Array.from({ length: 5 }) as (BiasResult["timeframes"][number] | null)[])
           : data?.timeframes ?? []

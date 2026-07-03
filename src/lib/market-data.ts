@@ -13,6 +13,20 @@ export type BiasResult = {
   timeframes: TimeframeBias[];
 };
 
+export type Instrument = {
+  symbol: string;
+  display: string;
+};
+
+export const INSTRUMENTS: Instrument[] = [
+  { symbol: "OANDA:EUR_USD", display: "EUR/USD" },
+  { symbol: "OANDA:GBP_USD", display: "GBP/USD" },
+  { symbol: "OANDA:XAU_USD", display: "Gold" },
+  { symbol: "OANDA:WTICO_USD", display: "Oil (WTI)" },
+  { symbol: "OANDA:NAS100_USD", display: "Nasdaq 100" },
+  { symbol: "OANDA:USD_JPY", display: "USD/JPY" },
+];
+
 const TIMEFRAMES: { label: string; resolution: string }[] = [
   { label: "5m", resolution: "5" },
   { label: "15m", resolution: "15" },
@@ -21,13 +35,29 @@ const TIMEFRAMES: { label: string; resolution: string }[] = [
   { label: "1D", resolution: "D" },
 ];
 
-const SAMPLE_TIMEFRAMES: TimeframeBias[] = [
-  { label: "5m", resolution: "5", bias: "bullish", changePercent: 0.06 },
-  { label: "15m", resolution: "15", bias: "bullish", changePercent: 0.11 },
-  { label: "1H", resolution: "60", bias: "neutral", changePercent: 0.01 },
-  { label: "4H", resolution: "240", bias: "bearish", changePercent: -0.34 },
-  { label: "1D", resolution: "D", bias: "bearish", changePercent: -0.82 },
-];
+// Deterministic per-symbol hash so sample bias varies believably when
+// switching instruments in the UI, without an API key configured.
+function seededRandom(seed: string) {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) {
+    h = (h * 31 + seed.charCodeAt(i)) | 0;
+  }
+  return (index: number) => {
+    const x = Math.sin(h + index * 104729) * 43758.5453;
+    return x - Math.floor(x);
+  };
+}
+
+function sampleTimeframesFor(symbol: string): TimeframeBias[] {
+  const rand = seededRandom(symbol);
+  return TIMEFRAMES.map((tf, i) => {
+    const r = rand(i);
+    const changePercent = (r - 0.5) * 1.6;
+    const bias: Bias =
+      Math.abs(changePercent) < 0.05 ? "neutral" : changePercent > 0 ? "bullish" : "bearish";
+    return { label: tf.label, resolution: tf.resolution, bias, changePercent };
+  });
+}
 
 function biasFromCloses(closes: number[]): { bias: Bias; changePercent: number } {
   const last = closes[closes.length - 1];
@@ -45,6 +75,10 @@ async function fetchFinnhubCandles(symbol: string, resolution: string, apiKey: s
     resolution === "D" ? 86400 : Number(resolution) * 60;
   const from = to - secondsPerBar * (barsNeeded + 5);
 
+  // Note: Finnhub routes different asset classes through different
+  // endpoints (forex/candle, stock/candle, crypto/candle). OANDA-prefixed
+  // forex and CFD-style symbols (majors, gold, oil, indices) work here;
+  // crypto symbols would need /crypto/candle instead.
   const url = new URL("https://finnhub.io/api/v1/forex/candle");
   url.searchParams.set("symbol", symbol);
   url.searchParams.set("resolution", resolution);
@@ -66,7 +100,7 @@ export async function getMultiTimeframeBias(symbol = "OANDA:EUR_USD"): Promise<B
   const apiKey = process.env.FINNHUB_API_KEY;
 
   if (!apiKey) {
-    return { symbol, source: "sample", timeframes: SAMPLE_TIMEFRAMES };
+    return { symbol, source: "sample", timeframes: sampleTimeframesFor(symbol) };
   }
 
   try {
@@ -79,6 +113,6 @@ export async function getMultiTimeframeBias(symbol = "OANDA:EUR_USD"): Promise<B
     );
     return { symbol, source: "finnhub", timeframes: results };
   } catch {
-    return { symbol, source: "sample", timeframes: SAMPLE_TIMEFRAMES };
+    return { symbol, source: "sample", timeframes: sampleTimeframesFor(symbol) };
   }
 }
