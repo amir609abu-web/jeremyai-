@@ -235,6 +235,15 @@
     "submitLoading": "שומר…",
     "genericError": "משהו השתבש. נסו שוב.",
     "securityNote": "התשלומים מעובדים באופן מאובטח על ידי Stripe. JeremyAI לעולם לא רואה את מספר הכרטיס המלא שלכם.",
-    "backToDashboard": "מעבר ללוח הבקרה"
+    "backToDashboard": "מעבר ללוח הבקרה",
+    "secureCheckout": "תשלום מאובטח",
+    "orderSummary": "סיכום הזמנה",
+    "planLabel": "מסלול",
+    "dueToday": "לתשלום היום",
+    "dueAfterTrial": "לתשלום בסיום תקופת הניסיון",
+    "trialEndsLabel": "תקופת הניסיון שלכם מסתיימת ב",
+    "securedByStripe": "התשלומים מאובטחים על ידי Stripe",
+    "encryptionNote": "פרטי הכרטיס שלכם מוצפנים ונשלחים ישירות ל-Stripe. JeremyAI לעולם לא רואה או שומרת את מספר הכרטיס המלא שלכם.",
+    "acceptedCards": "אנו מקבלים"
   }
 }

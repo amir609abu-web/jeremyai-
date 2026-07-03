@@ -235,6 +235,15 @@
     "submitLoading": "Saving…",
     "genericError": "Something went wrong. Please try again.",
     "securityNote": "Payments are processed securely by Stripe. JeremyAI never sees your full card number.",
-    "backToDashboard": "Go to dashboard"
+    "backToDashboard": "Go to dashboard",
+    "secureCheckout": "Secure Checkout",
+    "orderSummary": "Order summary",
+    "planLabel": "Plan",
+    "dueToday": "Due today",
+    "dueAfterTrial": "Due after trial ends",
+    "trialEndsLabel": "Your trial ends",
+    "securedByStripe": "Payments secured by Stripe",
+    "encryptionNote": "Your card details are encrypted and sent directly to Stripe. JeremyAI never sees or stores your full card number.",
+    "acceptedCards": "We accept"
   }
 }

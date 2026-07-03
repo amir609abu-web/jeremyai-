@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { loadStripe, type Stripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import { PaymentMethodForm } from "@/components/payment-method-form";
+import { OrderSummaryCard } from "@/components/order-summary-card";
 
 type SetupState =
   | { status: "loading" }
@@ -12,8 +13,27 @@ type SetupState =
   | { status: "error" }
   | { status: "ready"; clientSecret: string; stripePromise: Promise<Stripe | null> };
 
+function ShieldIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-5 w-5 text-primary"
+      aria-hidden
+    >
+      <path d="M12 3 4.5 6v6c0 4.5 3 7.5 7.5 9 4.5-1.5 7.5-4.5 7.5-9V6L12 3Z" />
+      <path d="m9 12 2 2 4-4" />
+    </svg>
+  );
+}
+
 export default function PaymentSetupPage() {
   const t = useTranslations("Billing");
+  const locale = useLocale();
   const [state, setState] = useState<SetupState>({ status: "loading" });
 
   useEffect(() => {
@@ -48,12 +68,21 @@ export default function PaymentSetupPage() {
 
   return (
     <div className="mx-auto flex min-h-[calc(100vh-80px)] max-w-md flex-col justify-center px-6 py-16">
-      <h1 className="font-display text-3xl font-semibold tracking-tight">{t("title")}</h1>
+      <div className="mb-2 inline-flex w-fit items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+        <ShieldIcon />
+        {t("secureCheckout")}
+      </div>
+
+      <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight">
+        {t("title")}
+      </h1>
       <p className="mt-2 text-sm text-muted">{t("subtitle")}</p>
 
-      <div className="mt-8">
+      <div className="mt-8 space-y-4">
+        <OrderSummaryCard />
+
         {state.status === "loading" && (
-          <div className="h-40 animate-pulse rounded-xl border border-border-glass bg-white/5" />
+          <div className="h-64 animate-pulse rounded-2xl border border-border-glass bg-white/5" />
         )}
 
         {state.status === "not_configured" && (
@@ -70,14 +99,16 @@ export default function PaymentSetupPage() {
         {state.status === "ready" && (
           <Elements
             stripe={state.stripePromise}
-            options={{ clientSecret: state.clientSecret, appearance: { theme: "night" } }}
+            options={{
+              clientSecret: state.clientSecret,
+              appearance: { theme: "night" },
+              locale: locale as "en" | "he" | "ar",
+            }}
           >
             <PaymentMethodForm />
           </Elements>
         )}
       </div>
-
-      <p className="mt-6 text-center text-xs text-muted-2">{t("securityNote")}</p>
     </div>
   );
 }

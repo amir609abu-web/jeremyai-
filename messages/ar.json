@@ -235,6 +235,15 @@
     "submitLoading": "جارٍ الحفظ…",
     "genericError": "حدث خطأ ما. حاول مرة أخرى.",
     "securityNote": "تتم معالجة المدفوعات بأمان بواسطة Stripe. لا ترى JeremyAI رقم بطاقتك الكامل أبداً.",
-    "backToDashboard": "الذهاب إلى لوحة التحكم"
+    "backToDashboard": "الذهاب إلى لوحة التحكم",
+    "secureCheckout": "دفع آمن",
+    "orderSummary": "ملخص الطلب",
+    "planLabel": "الخطة",
+    "dueToday": "المستحق اليوم",
+    "dueAfterTrial": "المستحق بعد انتهاء الفترة التجريبية",
+    "trialEndsLabel": "تنتهي فترتك التجريبية في",
+    "securedByStripe": "المدفوعات مؤمّنة بواسطة Stripe",
+    "encryptionNote": "بيانات بطاقتك مشفّرة وتُرسل مباشرةً إلى Stripe. لا ترى JeremyAI أو تخزّن رقم بطاقتك الكامل أبداً.",
+    "acceptedCards": "نقبل"
   }
 }
