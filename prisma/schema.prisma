@@ -24,6 +24,8 @@ model User {
 
   stripeCustomerId      String?  @unique
   stripePaymentMethodId String?
+  stripeSubscriptionId  String?  @unique
+  subscriptionStatus    String?
   hasPaymentMethod      Boolean  @default(true)
   trialEndsAt           DateTime?
 

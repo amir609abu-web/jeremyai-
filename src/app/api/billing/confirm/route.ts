@@ -33,19 +33,38 @@ export async function POST(request: Request) {
       ? setupIntent.payment_method
       : setupIntent.payment_method.id;
 
-  if (user.stripeCustomerId) {
-    await stripe.customers.update(user.stripeCustomerId, {
-      invoice_settings: { default_payment_method: paymentMethodId },
-    });
+  if (!user.stripeCustomerId) {
+    return Response.json({ error: "Missing Stripe customer" }, { status: 400 });
   }
 
-  const trialEndsAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  await stripe.customers.update(user.stripeCustomerId, {
+    invoice_settings: { default_payment_method: paymentMethodId },
+  });
+
+  const priceId = process.env.STRIPE_PRICE_ID;
+  if (!priceId) {
+    return Response.json({ error: "not_configured" }, { status: 503 });
+  }
+
+  const subscription = await stripe.subscriptions.create({
+    customer: user.stripeCustomerId,
+    items: [{ price: priceId }],
+    trial_period_days: 7,
+    default_payment_method: paymentMethodId,
+    payment_settings: { save_default_payment_method: "on_subscription" },
+  });
+
+  const trialEndsAt = subscription.trial_end
+    ? new Date(subscription.trial_end * 1000)
+    : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
   await prisma.user.update({
     where: { id: user.id },
     data: {
       hasPaymentMethod: true,
       stripePaymentMethodId: paymentMethodId,
+      stripeSubscriptionId: subscription.id,
+      subscriptionStatus: subscription.status,
       trialEndsAt,
     },
   });
