@@ -15,3 +15,24 @@ export function getStripe(): Stripe {
   }
   return stripeClient;
 }
+
+const RETENTION_COUPON_ID = "jeremyai-retention-10-usd";
+
+// Stripe coupons are idempotent by id, so re-running this after the coupon
+// already exists just retrieves it instead of erroring.
+export async function getOrCreateRetentionCoupon(): Promise<string> {
+  const stripe = getStripe();
+  try {
+    const existing = await stripe.coupons.retrieve(RETENTION_COUPON_ID);
+    return existing.id;
+  } catch {
+    const created = await stripe.coupons.create({
+      id: RETENTION_COUPON_ID,
+      amount_off: 1000,
+      currency: "usd",
+      duration: "forever",
+      name: "Retention offer — $10 off",
+    });
+    return created.id;
+  }
+}

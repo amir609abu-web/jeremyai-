@@ -20,6 +20,9 @@ export async function getCurrentUser() {
       createdAt: true,
       hasPaymentMethod: true,
       stripeCustomerId: true,
+      stripeSubscriptionId: true,
+      stripePaymentMethodId: true,
+      subscriptionStatus: true,
       trialEndsAt: true,
     },
   });

@@ -46,6 +46,12 @@ export default async function DashboardPage({
                 {t("admin")}
               </Link>
             )}
+            <Link
+              href="/account"
+              className="whitespace-nowrap rounded-full border border-border-glass px-4 py-2 text-sm text-foreground hover:bg-white/5"
+            >
+              {t("account")}
+            </Link>
             <LogoutButton />
           </div>
         </div>
