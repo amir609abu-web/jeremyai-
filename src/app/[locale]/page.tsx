@@ -6,6 +6,7 @@ import { Features } from "@/components/features";
 import { Pricing } from "@/components/pricing";
 import { OutroSection } from "@/components/outro-section";
 import { Footer } from "@/components/footer";
+import { AmbientGlow } from "@/components/ambient-glow";
 
 export default async function Home({
   params,
@@ -16,7 +17,8 @@ export default async function Home({
   setRequestLocale(locale);
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="relative flex flex-1 flex-col">
+      <AmbientGlow />
       <Navbar />
       <Hero />
       <GlobeSection />

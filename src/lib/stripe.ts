@@ -16,7 +16,7 @@ export function getStripe(): Stripe {
   return stripeClient;
 }
 
-const RETENTION_COUPON_ID = "jeremyai-retention-10-usd";
+const RETENTION_COUPON_ID = "jeremyai-retention-10-usd-12mo";
 
 // Stripe coupons are idempotent by id, so re-running this after the coupon
 // already exists just retrieves it instead of erroring.
@@ -30,8 +30,9 @@ export async function getOrCreateRetentionCoupon(): Promise<string> {
       id: RETENTION_COUPON_ID,
       amount_off: 1000,
       currency: "usd",
-      duration: "forever",
-      name: "Retention offer — $10 off",
+      duration: "repeating",
+      duration_in_months: 12,
+      name: "Retention offer — $10 off for 12 months",
     });
     return created.id;
   }
