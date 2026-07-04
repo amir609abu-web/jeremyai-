@@ -5,6 +5,7 @@ import { getMessages, getTranslations, setRequestLocale } from "next-intl/server
 import { notFound } from "next/navigation";
 import { routing, localeDirections } from "@/i18n/routing";
 import { CrispChat } from "@/components/crisp-chat";
+import { AmbientGlow } from "@/components/ambient-glow";
 import "./globals.css";
 
 const inter = Inter({
@@ -101,6 +102,7 @@ export default async function RootLayout({
       }
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
+        <AmbientGlow />
         <NextIntlClientProvider messages={messages}>
           {children}
           <CrispChat />
