@@ -9,7 +9,7 @@ export type TimeframeBias = {
 
 export type BiasResult = {
   symbol: string;
-  source: "finnhub" | "sample";
+  source: "twelvedata" | "sample";
   timeframes: TimeframeBias[];
 };
 
@@ -27,12 +27,23 @@ export const INSTRUMENTS: Instrument[] = [
   { symbol: "OANDA:USD_JPY", display: "USD/JPY" },
 ];
 
+// Twelve Data uses its own ticker conventions rather than the OANDA-style
+// symbols used elsewhere in the UI, so requests are mapped through this table.
+const TWELVEDATA_SYMBOL_MAP: Record<string, string> = {
+  "OANDA:EUR_USD": "EUR/USD",
+  "OANDA:GBP_USD": "GBP/USD",
+  "OANDA:XAU_USD": "XAU/USD",
+  "OANDA:WTICO_USD": "WTI/USD",
+  "OANDA:NAS100_USD": "NDX",
+  "OANDA:USD_JPY": "USD/JPY",
+};
+
 const TIMEFRAMES: { label: string; resolution: string }[] = [
-  { label: "5m", resolution: "5" },
-  { label: "15m", resolution: "15" },
-  { label: "1H", resolution: "60" },
-  { label: "4H", resolution: "240" },
-  { label: "1D", resolution: "D" },
+  { label: "5m", resolution: "5min" },
+  { label: "15m", resolution: "15min" },
+  { label: "1H", resolution: "1h" },
+  { label: "4H", resolution: "4h" },
+  { label: "1D", resolution: "1day" },
 ];
 
 // Deterministic per-symbol hash so sample bias varies believably when
@@ -68,50 +79,50 @@ function biasFromCloses(closes: number[]): { bias: Bias; changePercent: number }
   return { bias: changePercent > 0 ? "bullish" : "bearish", changePercent };
 }
 
-async function fetchFinnhubCandles(symbol: string, resolution: string, apiKey: string) {
-  const to = Math.floor(Date.now() / 1000);
-  const barsNeeded = 20;
-  const secondsPerBar =
-    resolution === "D" ? 86400 : Number(resolution) * 60;
-  const from = to - secondsPerBar * (barsNeeded + 5);
-
-  // Note: Finnhub routes different asset classes through different
-  // endpoints (forex/candle, stock/candle, crypto/candle). OANDA-prefixed
-  // forex and CFD-style symbols (majors, gold, oil, indices) work here;
-  // crypto symbols would need /crypto/candle instead.
-  const url = new URL("https://finnhub.io/api/v1/forex/candle");
+async function fetchTwelveDataCloses(
+  symbol: string,
+  interval: string,
+  apiKey: string
+): Promise<number[]> {
+  const url = new URL("https://api.twelvedata.com/time_series");
   url.searchParams.set("symbol", symbol);
-  url.searchParams.set("resolution", resolution);
-  url.searchParams.set("from", String(from));
-  url.searchParams.set("to", String(to));
-  url.searchParams.set("token", apiKey);
+  url.searchParams.set("interval", interval);
+  url.searchParams.set("outputsize", "20");
+  url.searchParams.set("apikey", apiKey);
 
   const res = await fetch(url, { next: { revalidate: 30 } });
-  if (!res.ok) throw new Error(`Finnhub request failed: ${res.status}`);
+  if (!res.ok) throw new Error(`Twelve Data request failed: ${res.status}`);
 
-  const data = (await res.json()) as { s: string; c?: number[] };
-  if (data.s !== "ok" || !data.c || data.c.length < 5) {
-    throw new Error("Finnhub returned insufficient candle data");
+  const data = (await res.json()) as {
+    status?: string;
+    values?: { close: string }[];
+  };
+  if (data.status !== "ok" || !data.values || data.values.length < 5) {
+    throw new Error("Twelve Data returned insufficient candle data");
   }
-  return data.c;
+
+  // Twelve Data returns bars newest-first; reverse to chronological order
+  // so the last element is the most recent close, as biasFromCloses expects.
+  return data.values.map((v) => Number(v.close)).reverse();
 }
 
 export async function getMultiTimeframeBias(symbol = "OANDA:EUR_USD"): Promise<BiasResult> {
-  const apiKey = process.env.FINNHUB_API_KEY;
+  const apiKey = process.env.TWELVEDATA_API_KEY;
+  const providerSymbol = TWELVEDATA_SYMBOL_MAP[symbol];
 
-  if (!apiKey) {
+  if (!apiKey || !providerSymbol) {
     return { symbol, source: "sample", timeframes: sampleTimeframesFor(symbol) };
   }
 
   try {
     const results = await Promise.all(
       TIMEFRAMES.map(async (tf) => {
-        const closes = await fetchFinnhubCandles(symbol, tf.resolution, apiKey);
+        const closes = await fetchTwelveDataCloses(providerSymbol, tf.resolution, apiKey);
         const { bias, changePercent } = biasFromCloses(closes);
         return { label: tf.label, resolution: tf.resolution, bias, changePercent };
       })
     );
-    return { symbol, source: "finnhub", timeframes: results };
+    return { symbol, source: "twelvedata", timeframes: results };
   } catch {
     return { symbol, source: "sample", timeframes: sampleTimeframesFor(symbol) };
   }

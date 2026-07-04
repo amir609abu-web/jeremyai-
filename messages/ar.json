@@ -106,7 +106,7 @@
     "indicativePricing": "أسعار إرشادية",
     "biasLiveData": "بيانات مباشرة",
     "biasSampleData": "بيانات تجريبية",
-    "biasSampleNote": "يتم عرض بيانات اتجاه تجريبية. أضف FINNHUB_API_KEY لحسابها مباشرةً.",
+    "biasSampleNote": "يتم عرض بيانات اتجاه تجريبية. أضف TWELVEDATA_API_KEY لحسابها مباشرةً.",
     "bullish": "صاعد",
     "bearish": "هابط",
     "neutral": "محايد",

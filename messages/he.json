@@ -106,7 +106,7 @@
     "indicativePricing": "מחירים לצורך המחשה",
     "biasLiveData": "נתונים בזמן אמת",
     "biasSampleData": "נתוני דוגמה",
-    "biasSampleNote": "מוצגים נתוני מגמה לדוגמה. הוסיפו FINNHUB_API_KEY כדי לחשב זאת בזמן אמת.",
+    "biasSampleNote": "מוצגים נתוני מגמה לדוגמה. הוסיפו TWELVEDATA_API_KEY כדי לחשב זאת בזמן אמת.",
     "bullish": "עולה",
     "bearish": "יורד",
     "neutral": "ניטרלי",

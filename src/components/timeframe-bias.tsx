@@ -68,12 +68,12 @@ export function TimeframeBias({
         {data && (
           <span
             className={`rounded-full px-3 py-1 text-xs ${
-              data.source === "finnhub"
+              data.source === "twelvedata"
                 ? "border border-primary/30 bg-primary/10 text-primary"
                 : "border border-yellow-500/30 bg-yellow-500/10 text-yellow-200"
             }`}
           >
-            {data.source === "finnhub" ? t("biasLiveData") : t("biasSampleData")}
+            {data.source === "twelvedata" ? t("biasLiveData") : t("biasSampleData")}
           </span>
         )}
       </div>

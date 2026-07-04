@@ -106,7 +106,7 @@
     "indicativePricing": "Indicative pricing",
     "biasLiveData": "Live data",
     "biasSampleData": "Sample data",
-    "biasSampleNote": "Showing sample bias data. Add a FINNHUB_API_KEY to compute this live.",
+    "biasSampleNote": "Showing sample bias data. Add a TWELVEDATA_API_KEY to compute this live.",
     "bullish": "Bullish",
     "bearish": "Bearish",
     "neutral": "Neutral",
