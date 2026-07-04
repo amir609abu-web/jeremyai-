@@ -91,14 +91,16 @@ async function fetchTwelveDataCloses(
   url.searchParams.set("apikey", apiKey);
 
   const res = await fetch(url, { next: { revalidate: 30 } });
-  if (!res.ok) throw new Error(`Twelve Data request failed: ${res.status}`);
-
-  const data = (await res.json()) as {
+  const data = (await res.json().catch(() => null)) as {
     status?: string;
+    message?: string;
     values?: { close: string }[];
-  };
-  if (data.status !== "ok" || !data.values || data.values.length < 5) {
-    throw new Error("Twelve Data returned insufficient candle data");
+  } | null;
+
+  if (!res.ok || !data || data.status !== "ok" || !data.values || data.values.length < 5) {
+    throw new Error(
+      `Twelve Data ${symbol}/${interval} failed: ${res.status} ${data?.message ?? "no message"}`
+    );
   }
 
   // Twelve Data returns bars newest-first; reverse to chronological order
