@@ -1,12 +1,13 @@
-import { z } from "zod";
-import { getCurrentUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
-import { getStripe, isStripeConfigured } from "@/lib/stripe";
+import { getCurrentUser } from "@/lib/session";
+import { getPaddle, isPaddleConfigured } from "@/lib/paddle";
 
-const schema = z.object({ setupIntentId: z.string().min(1) });
-
-export async function POST(request: Request) {
-  if (!isStripeConfigured()) {
+// Called by the client right after the Paddle overlay checkout reports
+// checkout.completed. The webhook is the long-term source of truth for
+// subscription status, but it can lag a beat behind the browser event, so
+// this looks the subscription up directly to unlock the dashboard immediately.
+export async function POST() {
+  if (!isPaddleConfigured()) {
     return Response.json({ error: "not_configured" }, { status: 503 });
   }
 
@@ -15,57 +16,33 @@ export async function POST(request: Request) {
     return Response.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  const body = await request.json().catch(() => null);
-  const parsed = schema.safeParse(body);
-  if (!parsed.success) {
-    return Response.json({ error: "Invalid input" }, { status: 400 });
+  const paddle = getPaddle();
+
+  let customerId = user.paddleCustomerId;
+  if (!customerId) {
+    const customers = await paddle.customers.list({ email: [user.email] }).next();
+    customerId = customers[0]?.id ?? null;
+  }
+  if (!customerId) {
+    return Response.json({ error: "not_found" }, { status: 404 });
   }
 
-  const stripe = getStripe();
-  const setupIntent = await stripe.setupIntents.retrieve(parsed.data.setupIntentId);
-
-  if (setupIntent.status !== "succeeded" || !setupIntent.payment_method) {
-    return Response.json({ error: "Payment method was not confirmed" }, { status: 400 });
+  const subscriptions = await paddle.subscriptions
+    .list({ customerId: [customerId], perPage: 1 })
+    .next();
+  const subscription = subscriptions[0];
+  if (!subscription) {
+    return Response.json({ error: "not_found" }, { status: 404 });
   }
-
-  const paymentMethodId =
-    typeof setupIntent.payment_method === "string"
-      ? setupIntent.payment_method
-      : setupIntent.payment_method.id;
-
-  if (!user.stripeCustomerId) {
-    return Response.json({ error: "Missing Stripe customer" }, { status: 400 });
-  }
-
-  await stripe.customers.update(user.stripeCustomerId, {
-    invoice_settings: { default_payment_method: paymentMethodId },
-  });
-
-  const priceId = process.env.STRIPE_PRICE_ID;
-  if (!priceId) {
-    return Response.json({ error: "not_configured" }, { status: 503 });
-  }
-
-  const subscription = await stripe.subscriptions.create({
-    customer: user.stripeCustomerId,
-    items: [{ price: priceId }],
-    trial_period_days: 7,
-    default_payment_method: paymentMethodId,
-    payment_settings: { save_default_payment_method: "on_subscription" },
-  });
-
-  const trialEndsAt = subscription.trial_end
-    ? new Date(subscription.trial_end * 1000)
-    : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
   await prisma.user.update({
     where: { id: user.id },
     data: {
       hasPaymentMethod: true,
-      stripePaymentMethodId: paymentMethodId,
-      stripeSubscriptionId: subscription.id,
+      paddleCustomerId: customerId,
+      paddleSubscriptionId: subscription.id,
       subscriptionStatus: subscription.status,
-      trialEndsAt,
+      trialEndsAt: subscription.nextBilledAt ? new Date(subscription.nextBilledAt) : null,
     },
   });
 

@@ -22,9 +22,8 @@ model User {
   acceptedTermsAt      DateTime
   acceptedTermsVersion String
 
-  stripeCustomerId      String?  @unique
-  stripePaymentMethodId String?
-  stripeSubscriptionId  String?  @unique
+  paddleCustomerId      String?  @unique
+  paddleSubscriptionId  String?  @unique
   subscriptionStatus    String?
   hasPaymentMethod      Boolean  @default(true)
   trialEndsAt           DateTime?

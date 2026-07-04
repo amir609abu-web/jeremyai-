@@ -1,17 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useLocale, useTranslations } from "next-intl";
-import { loadStripe, type Stripe } from "@stripe/stripe-js";
-import { Elements } from "@stripe/react-stripe-js";
-import { PaymentMethodForm } from "@/components/payment-method-form";
+import { useTranslations } from "next-intl";
+import { PaddleCheckoutButton } from "@/components/paddle-checkout-button";
 import { OrderSummaryCard } from "@/components/order-summary-card";
 
 type SetupState =
   | { status: "loading" }
   | { status: "not_configured" }
   | { status: "error" }
-  | { status: "ready"; clientSecret: string; stripePromise: Promise<Stripe | null> };
+  | { status: "ready"; priceId: string; email: string; userId: string };
 
 function ShieldIcon() {
   return (
@@ -33,13 +31,12 @@ function ShieldIcon() {
 
 export default function PaymentSetupPage() {
   const t = useTranslations("Billing");
-  const locale = useLocale();
   const [state, setState] = useState<SetupState>({ status: "loading" });
 
   useEffect(() => {
     let cancelled = false;
 
-    fetch("/api/billing/setup-intent", { method: "POST" })
+    fetch("/api/billing/checkout-config")
       .then(async (res) => {
         if (cancelled) return;
         if (res.status === 503) {
@@ -53,8 +50,9 @@ export default function PaymentSetupPage() {
         const data = await res.json();
         setState({
           status: "ready",
-          clientSecret: data.clientSecret,
-          stripePromise: loadStripe(data.publishableKey),
+          priceId: data.priceId,
+          email: data.email,
+          userId: data.userId,
         });
       })
       .catch(() => {
@@ -82,7 +80,7 @@ export default function PaymentSetupPage() {
         <OrderSummaryCard />
 
         {state.status === "loading" && (
-          <div className="h-64 animate-pulse rounded-2xl border border-border-glass bg-white/5" />
+          <div className="h-40 animate-pulse rounded-2xl border border-border-glass bg-white/5" />
         )}
 
         {state.status === "not_configured" && (
@@ -97,16 +95,11 @@ export default function PaymentSetupPage() {
         )}
 
         {state.status === "ready" && (
-          <Elements
-            stripe={state.stripePromise}
-            options={{
-              clientSecret: state.clientSecret,
-              appearance: { theme: "night" },
-              locale: locale as "en" | "he" | "ar",
-            }}
-          >
-            <PaymentMethodForm />
-          </Elements>
+          <PaddleCheckoutButton
+            priceId={state.priceId}
+            email={state.email}
+            userId={state.userId}
+          />
         )}
       </div>
     </div>

@@ -236,7 +236,7 @@
       "title": "Privacy Policy",
       "s1_title": "1. What we collect",
       "s1_item1": "Account data: name, email, hashed password, signup date.",
-      "s1_item2": "Billing data: handled by our payment processor (Apple Pay / Google Pay via Stripe). We do not store raw card numbers.",
+      "s1_item2": "Billing data: handled by our payment processor, Paddle.com (acting as merchant of record). We do not store raw card numbers.",
       "s1_item3": "Usage data: pages visited, features used, device/browser information.",
       "s1_item4": "AI assistant conversations: the messages you send to and receive from the AI assistant, stored to provide the Service, improve it, and for safety review.",
       "s2_title": "2. Internal access to your AI conversations",
@@ -247,7 +247,7 @@
       "s3_item3": "To improve the product, including analyzing aggregate usage and reviewing AI conversations for quality and safety.",
       "s3_item4": "To communicate with you about your account, security, and (if you opt in) product updates.",
       "s4_title": "4. Payment data",
-      "s4_body": "Card-based payments (Apple Pay, Google Pay) are processed by Stripe. We receive confirmation of payment and a transaction reference, not your full payment credentials.",
+      "s4_body": "Payments are processed by Paddle.com, who acts as the merchant of record for your purchase. We receive confirmation of payment and a transaction reference, not your full payment credentials.",
       "s5_title": "5. Data retention",
       "s5_body": "We retain account and conversation data for as long as your account is active, plus a reasonable period after closure for legal, security, and dispute-resolution purposes. [Placeholder — set a specific retention window once finalized.]",
       "s6_title": "6. Your rights",
@@ -283,7 +283,7 @@
     "submit": "Start My Free Trial",
     "submitLoading": "Saving…",
     "genericError": "Something went wrong. Please try again.",
-    "securityNote": "Payments are processed securely by Stripe. JeremyAI never sees your full card number.",
+    "securityNote": "Payments are processed securely by Paddle. JeremyAI never sees your full card number.",
     "backToDashboard": "Go to dashboard",
     "secureCheckout": "Secure Checkout",
     "orderSummary": "Order summary",
@@ -291,8 +291,8 @@
     "dueToday": "Due today",
     "dueAfterTrial": "Due after trial ends",
     "trialEndsLabel": "Your trial ends",
-    "securedByStripe": "Payments secured by Stripe",
-    "encryptionNote": "Your card details are encrypted and sent directly to Stripe. JeremyAI never sees or stores your full card number.",
+    "securedByPaddle": "Payments secured by Paddle",
+    "encryptionNote": "Your card details are encrypted and sent directly to Paddle. JeremyAI never sees or stores your full card number.",
     "acceptedCards": "We accept"
   }
 }

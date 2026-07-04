@@ -1,5 +1,5 @@
 import { getCurrentUser } from "@/lib/session";
-import { getStripe, isStripeConfigured } from "@/lib/stripe";
+import { getPaddle, isPaddleConfigured } from "@/lib/paddle";
 
 export async function GET() {
   const user = await getCurrentUser();
@@ -11,17 +11,19 @@ export async function GET() {
   let currentPeriodEnd: string | null = null;
   let hasDiscount = false;
 
-  if (isStripeConfigured() && user.stripePaymentMethodId) {
-    const stripe = getStripe();
-
+  if (isPaddleConfigured() && user.paddleCustomerId) {
+    const paddle = getPaddle();
     try {
-      const pm = await stripe.paymentMethods.retrieve(user.stripePaymentMethodId);
-      if (pm.card) {
+      const methods = await paddle.paymentMethods
+        .list(user.paddleCustomerId, { perPage: 1 })
+        .next();
+      const pm = methods[0];
+      if (pm?.card) {
         card = {
-          brand: pm.card.brand,
+          brand: pm.card.type,
           last4: pm.card.last4,
-          expMonth: pm.card.exp_month,
-          expYear: pm.card.exp_year,
+          expMonth: pm.card.expiryMonth,
+          expYear: pm.card.expiryYear,
         };
       }
     } catch {
@@ -29,14 +31,12 @@ export async function GET() {
     }
   }
 
-  if (isStripeConfigured() && user.stripeSubscriptionId) {
-    const stripe = getStripe();
+  if (isPaddleConfigured() && user.paddleSubscriptionId) {
+    const paddle = getPaddle();
     try {
-      const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
-      currentPeriodEnd = subscription.items.data[0]?.current_period_end
-        ? new Date(subscription.items.data[0].current_period_end * 1000).toISOString()
-        : null;
-      hasDiscount = Boolean(subscription.discounts && subscription.discounts.length > 0);
+      const subscription = await paddle.subscriptions.get(user.paddleSubscriptionId);
+      currentPeriodEnd = subscription.nextBilledAt;
+      hasDiscount = Boolean(subscription.discount);
     } catch {
       currentPeriodEnd = null;
     }
